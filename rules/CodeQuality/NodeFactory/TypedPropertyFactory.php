@@ -30,13 +30,22 @@ final class TypedPropertyFactory
         return new Property(Class_::MODIFIER_PRIVATE, [$propertyProperty], [], $propertyTypeNode);
     }
 
-    public function createPropertyTypeNode(PropertyTagValueNode $propertyTagValueNode, Class_ $class): Node
-    {
+    public function createPropertyTypeNode(
+        PropertyTagValueNode $propertyTagValueNode,
+        Class_ $class,
+        bool $isNullable = true
+    ): Node {
         $propertyType = $this->staticTypeMapper->mapPHPStanPhpDocTypeNodeToPHPStanType(
             $propertyTagValueNode->type,
             $class
         );
 
-        return $this->staticTypeMapper->mapPHPStanTypeToPhpParserNode($propertyType, TypeKind::PROPERTY);
+        $typeNode = $this->staticTypeMapper->mapPHPStanTypeToPhpParserNode($propertyType, TypeKind::PROPERTY);
+
+        if ($isNullable && ! $typeNode instanceof Node\NullableType) {
+            return new Node\NullableType($typeNode);
+        }
+
+        return $typeNode;
     }
 }
