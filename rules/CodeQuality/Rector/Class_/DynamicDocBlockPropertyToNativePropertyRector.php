@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Rector\CodeQuality\Rector\Class_;
 
 use PhpParser\Node;
+use PhpParser\Node\Attribute;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -88,7 +89,7 @@ CODE_SAMPLE
      */
     public function refactor(Node $node): ?Node
     {
-        if (! $this->attributeFinder->findAttributeByClass($node, 'AllowDynamicProperties')) {
+        if (! $this->attributeFinder->findAttributeByClass($node, 'AllowDynamicProperties') instanceof Attribute) {
             return null;
         }
 
@@ -158,11 +159,7 @@ CODE_SAMPLE
                 }
 
                 $defaultValue = $existingProperty->props[0]->default;
-                if ($defaultValue instanceof Expr && $this->valueResolver->isNull($defaultValue)) {
-                    $isNullable = true;
-                } else {
-                    $isNullable = false;
-                }
+                $isNullable = $defaultValue instanceof Expr && $this->valueResolver->isNull($defaultValue);
 
                 $existingProperty->type = $this->typedPropertyFactory->createPropertyTypeNode(
                     $propertyTagValueNode,

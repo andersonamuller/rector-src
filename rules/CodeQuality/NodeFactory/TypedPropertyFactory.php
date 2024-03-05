@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Rector\CodeQuality\NodeFactory;
 
+use PhpParser\Node\NullableType;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
@@ -12,7 +13,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PropertyTagValueNode;
 use Rector\PHPStanStaticTypeMapper\Enum\TypeKind;
 use Rector\StaticTypeMapper\StaticTypeMapper;
 
-final class TypedPropertyFactory
+final readonly class TypedPropertyFactory
 {
     public function __construct(
         private StaticTypeMapper $staticTypeMapper,
@@ -42,8 +43,8 @@ final class TypedPropertyFactory
 
         $typeNode = $this->staticTypeMapper->mapPHPStanTypeToPhpParserNode($propertyType, TypeKind::PROPERTY);
 
-        if ($isNullable && ! $typeNode instanceof Node\NullableType) {
-            return new Node\NullableType($typeNode);
+        if ($isNullable && ! $typeNode instanceof NullableType) {
+            return new NullableType($typeNode);
         }
 
         return $typeNode;
